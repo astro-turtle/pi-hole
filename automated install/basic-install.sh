@@ -75,7 +75,8 @@ webroot="/var/www/html"
 # webInterfaceGitUrl="https://github.com/pi-hole/AdminLTE.git" # Original Pi-hole Dashboard
 webInterfaceGitUrl="https://github.com/astro-turtle/AdminLTE.git" # Our Forked Pi-hole Dashboard
 webInterfaceDir="${webroot}/admin"
-piholeGitUrl="https://github.com/pi-hole/pi-hole.git"
+# piholeGitUrl="https://github.com/pi-hole/pi-hole.git" # Original Pi-hole
+piholeGitUrl="https://github.com/astro-turtle/pi-hole.git" # Our Forked Pi-hole
 PI_HOLE_LOCAL_REPO="/etc/.pihole"
 # List of pihole scripts, stored in an array
 PI_HOLE_FILES=(chronometer list piholeDebug piholeLogFlush setupLCD update version gravity uninstall webpage)
