@@ -2464,6 +2464,34 @@ copy_to_install_log() {
     chmod 644 "${installLogLoc}"
 }
 
+configure_https_self_sign() {
+    # Configure AdminLTE to HTTPS
+    ssl_key_path="/etc/pihole/certificate.key"
+    ssl_cert_path="/etc/pihole/certificate.crt"
+    ssl_pem_path="/etc/pihole/certificate.pem"
+    lighttpd_external_conf="/etc/lighttpd/external.conf"
+
+    openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout $ssl_key_path \
+    -out $ssl_cert_path -subj "/CN=pi.hole"
+    cat $ssl_key_path $ssl_cert_path > "${ssl_pem_path}"
+    apt install lighttpd-mod-openssl -y
+    cat << EOF | sed 's/    /\t/g' > "${lighttpd_external_conf}"
+server.modules += ( "mod_openssl" )
+setenv.add-environment = ( "fqdn" => "true" )
+\$SERVER["socket"] == ":443" {
+    ssl.engine = "enable"
+    ssl.pemfile = "${ssl_pem_path}"
+}
+# Redirect HTTP to HTTPS
+\$HTTP["scheme"] == "http" {
+    \$HTTP["host"] =~ ".*" {
+        url.redirect = ( ".*" => "https://%0\$0" )
+    }
+}
+EOF
+    service lighttpd restart
+}
+
 main() {
     ######## FIRST CHECK ########
     # Must be root to install
@@ -2657,6 +2685,18 @@ main() {
     fi
 
     printf "  %b Restarting services...\\n" "${INFO}"
+
+    # If the Web server was installed,
+    if [[ "${INSTALL_WEB_SERVER}" == true ]]; then
+        if [[ "${LIGHTTPD_ENABLED}" == true ]]; then
+            configure_https_self_sign
+            restart_service lighttpd
+            printf "  %b Enforced HTTPS on Web GUI\\n" "${TICK}"
+        else
+            printf "  %b HTTPS not enforced on Web GUI\\n" "${CROSS}"
+        fi
+    fi
+
     # Start services
 
     # Enable FTL
