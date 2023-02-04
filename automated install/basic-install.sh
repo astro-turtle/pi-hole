@@ -66,6 +66,9 @@ coltable="/opt/pihole/COL_TABLE"
 # Root of the web server
 webroot="/var/www/html"
 
+# Web server user
+webuser="www-data"
+
 
 # We clone (or update) two git repositories during the install. This helps to make sure that we always have the latest versions of the relevant files.
 # AdminLTE is used to set up the Web admin interface.
@@ -2159,6 +2162,11 @@ clone_or_update_repos() {
             # get the Web git files
             getGitFiles ${webInterfaceDir} ${webInterfaceGitUrl} || \
             { printf "  %b Unable to clone %s into ${webInterfaceDir}, exiting installer%b\\n" "${COL_LIGHT_RED}" "${webInterfaceGitUrl}" "${COL_NC}"; \
+            exit 1; \
+            }
+            # ensure webinterfacegui is webuser ownership
+            chown -R ${webuser}:${webuser} ${webroot} || \
+            { printf "  %b Unable update webroot ownership to ${webuser} %b\\n" "${COL_LIGHT_RED}" "${webuser}" "${COL_NC}"; \
             exit 1; \
             }
         fi
