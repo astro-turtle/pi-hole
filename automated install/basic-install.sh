@@ -516,6 +516,8 @@ getGitFiles() {
     else
         # Show an error
         printf "%b  %b %s\\n" "${OVER}" "${CROSS}" "${str}"
+        # Ensure directory is removed before trying again
+        rm -rf ${directory}
         # Attempt to make the repository, showing an error on failure
         make_repo "${directory}" "${remoteRepo}" || { printf "\\n  %bError: Could not update local repository. Contact support.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
     fi
