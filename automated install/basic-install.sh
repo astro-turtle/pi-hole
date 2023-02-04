@@ -339,7 +339,7 @@ package_manager_detect() {
         PIHOLE_DEPS=(cron curl iputils-ping psmisc sudo unzip idn2 libcap2-bin dns-root-data libcap2 netcat-openbsd procps jq)
         # Packages required for the Web admin interface (stored as an array)
         # It's useful to separate this from Pi-hole, since the two repos are also setup separately
-        PIHOLE_WEB_DEPS=(lighttpd "${phpVer}-common" "${phpVer}-cgi" "${phpVer}-sqlite3" "${phpVer}-xml" "${phpVer}-intl")
+        PIHOLE_WEB_DEPS=(composer lighttpd "${phpVer}-common" "${phpVer}-cgi" "${phpVer}-sqlite3" "${phpVer}-xml" "${phpVer}-intl")
         # Prior to PHP8.0, JSON functionality is provided as dedicated module, required by Pi-hole AdminLTE: https://www.php.net/manual/json.installation.php
         if [[ -z "${phpInsMajor}" || "${phpInsMajor}" -lt 8 ]]; then
             PIHOLE_WEB_DEPS+=("${phpVer}-json")
@@ -2500,6 +2500,11 @@ EOF
     service lighttpd restart
 }
 
+
+install_php_libraries_composer() {
+    sudo -u ${webuser} composer install -d ${webInterfaceDir}
+}
+
 main() {
     ######## FIRST CHECK ########
     # Must be root to install
@@ -2630,6 +2635,10 @@ main() {
     printf "  %b Checking for / installing Required dependencies for Pi-hole software...\\n" "${INFO}"
     install_dependent_packages "${dep_install_list[@]}"
     unset dep_install_list
+
+    # Install php libraries (using composer)
+    printf "  %b Installing required PHP Libraries via composer...\\n" "${INFO}"
+    install_php_libraries_composer
 
     # On some systems, lighttpd is not enabled on first install. We need to enable it here if the user
     # has chosen to install the web interface, else the LIGHTTPD_ENABLED check will fail
