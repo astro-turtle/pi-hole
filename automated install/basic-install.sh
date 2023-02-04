@@ -1992,7 +1992,7 @@ displayFinalMessage() {
     # If the user wants to install the dashboard,
     if [[ "${INSTALL_WEB_INTERFACE}" == true ]]; then
         # Store a message in a variable and display it
-        additional="View the web interface at http://pi.hole/admin or http://${IPV4_ADDRESS%/*}/admin\\n\\nYour Admin Webpage login password is ${pwstring}"
+        additional="View the web interface at https://pi.hole/admin or https://${IPV4_ADDRESS%/*}/admin\\n\\nYour Admin Webpage login password is ${pwstring}"
     fi
 
     # Final completion message to user
