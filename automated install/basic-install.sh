@@ -2482,7 +2482,7 @@ configure_https_self_sign() {
     lighttpd_external_conf="/etc/lighttpd/external.conf"
 
     openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout $ssl_key_path \
-    -out $ssl_cert_path -subj "/CN=pi.hole"
+    -out $ssl_cert_path -subj "/CN=pi.hole" -addext "subjectAltName=DNS:pi.hole,DNS:www.pi.hole"
     cat $ssl_key_path $ssl_cert_path > "${ssl_pem_path}"
     apt install lighttpd-mod-openssl -y
     cat << EOF | sed 's/    /\t/g' > "${lighttpd_external_conf}"
